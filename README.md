@@ -15,10 +15,14 @@ A high-performance Python/NumPy implementation of the **Multilinear Generalized 
 
 ---
 
+🌐 *Read this documentation in [German / Deutsch](README_DE.md).*
+
+---
+
 ## 👥 Authors & Contributors
 
 *   **Main Author:** Forstwichtel [forstwichtel@gmail.com]
-*   **Co-Author:** Gemini Notebook [bot]
+*   **Co-Author:** Helferlein [bot]
 
 ---
 
