@@ -1,18 +1,12 @@
 # TensoRAG: Multilineare Verallgemeinerte Singulärwertzerlegung (ML-GSVD)
 
-<p align="center">
-  <img src="tensorag_github_logo.png" alt="TensoRAG Logo" width="800">
-</p>
+[![Interactive Demo](https://img.shields.io/badge/Streamlit-Interactive_Demo-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://tensorag.streamlit.app/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
-Eine hochperformante Python/NumPy-Implementierung der **Multilinearen Verallgemeinerten Singulärwertzerlegung (ML-GSVD)**, basierend auf der bahnbrechenden mathematischen Forschung von **Dr. Liana Khamidullina** und **Prof. Dr. Martin Haardt** (Technische Universität Ilmenau).
+Eine hochperformante Python/NumPy-Implementierung der Multilinearen Verallgemeinerten Singulärwertzerlegung (ML-GSVD), basierend auf der bahnbrechenden mathematischen Forschung von Dr. Liana Khamidullina und Prof. Dr. Martin Haardt (Technische Universität Ilmenau).
 
-[![Lizenz](https://img.shields.io/badge/Lizenz-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.12](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
-[![Interaktive Demo](https://img.shields.io/badge/Streamlit-Interaktive_Demo-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://tensorag.streamlit.app/)
-
-> ⚠️ **Haftungsausschluss (Disclaimer):** Dies ist ein unabhängiges, privates Hobbyprojekt, das von @Forstwichtel entwickelt wurde. Es steht in keiner offiziellen Verbindung zu den Autoren der wissenschaftlichen Arbeit oder der Technischen Universität Ilmenau, wurde von diesen nicht geprüft und wird nicht offiziell unterstützt. Dieses Repository dient ausschließlich als unabhängige Implementierung der veröffentlichten akademischen Ergebnisse.
-
----
+⚠️ **Haftungsausschluss (Disclaimer):** Dies ist ein unabhängiges, privates Hobbyprojekt, das von @Forstwichtel entwickelt wurde. Es steht in keiner offiziellen Verbindung zu den Autoren der wissenschaftlichen Arbeit oder der Technischen Universität Ilmenau, wurde von diesen nicht geprüft und wird nicht offiziell unterstützt. Dieses Repository dient ausschließlich als unabhängige Implementierung der veröffentlichten akademischen Ergebnisse.
 
 🌐 *Read this documentation in [English](README.md).*
 
@@ -47,6 +41,7 @@ $$\mathbf{H}_k \approx \mathbf{B}_k \cdot \mathbf{C}_k \cdot \mathbf{A}^H \quad 
 *   **Alternating Least Squares (ALS):** Nutzt den robusten, iterativen *Direct Fitting* Optimierungsalgorithmus zur schnellen Konvergenz.
 *   **Unterstützung für komplexe & reelle Zahlen:** Vollständig kompatibel mit reellwertigen Daten (z. B. Gewichten neuronaler Netze) und komplexwertigen Daten (z. B. Kanalmatrizen in der drahtlosen Signalverarbeitung / MIMO-Systemen).
 *   **Radikale Low-Rank-Kompression:** Perfekt geeignet zur Reduzierung des Speicherbedarfs im Deep Learning (z. B. Kompression von Attention-Layern) und zur drastischen Optimierung großer Vektordatenbanken (RAG).
+*   **Interaktive KI-Agenten-Simulation:** Enthält eine visuelle Live-Simulation, die zeigt, wie ein autonomer KI-Agent eine komprimierte TensoRAG-Vektordatenbank als Werkzeug nutzt, um komplexe Fragen mit minimalem Speicherverbrauch zu beantworten.
 
 ---
 
