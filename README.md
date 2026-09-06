@@ -1,19 +1,12 @@
 # TensoRAG: Multilinear Generalized Singular Value Decomposition (ML-GSVD)
 
-<p align="center">
-  <img src="tensorag_github_logo.png" alt="TensoRAG Logo" width="800">
-</p>
-
 [![Interactive Demo](https://img.shields.io/badge/Streamlit-Interactive_Demo-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://tensorag.streamlit.app/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
-A high-performance Python/NumPy implementation of the **Multilinear Generalized Singular Value Decomposition (ML-GSVD)**, based on the pioneering mathematical research of **Dr. Liana Khamidullina** and **Prof. Martin Haardt** (Technische Universität Ilmenau).
+A high-performance Python/NumPy implementation of the Multilinear Generalized Singular Value Decomposition (ML-GSVD), based on the pioneering mathematical research of Dr. Liana Khamidullina and Prof. Martin Haardt (Technische Universität Ilmenau).
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.12](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
-
-> ⚠️ **Disclaimer:** This is an independent, private hobby project developed by @Forstwichtel. It is not officially affiliated with, endorsed by, or in any way connected to the authors or the Technische Universität Ilmenau. This repository serves solely as an independent implementation of their published academic findings.
-
----
+⚠️ **Disclaimer:** This is an independent, private hobby project developed by @Forstwichtel. It is not officially affiliated with, endorsed by, or in any way connected to the authors or the Technische Universität Ilmenau. This repository serves solely as an independent implementation of their published academic findings.
 
 🌐 *Read this documentation in [German / Deutsch](README_DE.md).*
 
@@ -48,6 +41,8 @@ $$\mathbf{H}_k \approx \mathbf{B}_k \cdot \mathbf{C}_k \cdot \mathbf{A}^H \quad 
 *   **Alternating Least Squares (ALS):** Implements the robust *Direct Fitting* iterative optimization algorithm.
 *   **Complex & Real Support:** Fully compatible with both real-valued data (e.g., neural network weights) and complex-valued data (e.g., wireless signal processing / MIMO channel matrices).
 *   **Low-Rank Compression:** Optimal for reducing parameter footprint in deep learning (e.g., compressing Attention layers) and streamlining large-scale Vector Search / RAG databases.
+*   **Interactive AI Agent Simulation:** Features a live, step-by-step simulation demonstrating how an autonomous AI Agent uses the compressed ML-GSVD vector database as a retrieval tool to answer queries with minimum memory overhead.
+
 
 ---
 
