@@ -239,6 +239,7 @@ if Q >= I:
 max_iter = st.sidebar.slider(lbl_max_iter, min_value=5, max_value=50, value=25)
 
 # Helper function to perform generation and training
+@st.cache_resource
 def generate_and_fit_model(K_val, doc_counts_val, I_val, Q_val, max_iter_val):
     # 1. Generate realistic synthetic semantic embeddings
     np.random.seed(42)
@@ -258,13 +259,21 @@ def generate_and_fit_model(K_val, doc_counts_val, I_val, Q_val, max_iter_val):
 
 # INITIAL RUN AND VALUE RETRIEVAL
 # On first run, we train with initial settings and store them in session state
+# INITIAL RUN AND VALUE RETRIEVAL
+# On first run, we train with stable default settings and store them in session state
+DEFAULT_K = 3
+DEFAULT_COUNTS = (120, 90, 150)
+DEFAULT_I = 1536
+DEFAULT_Q = 128
+DEFAULT_MAX_ITER = 25
+
 if "trained_params" not in st.session_state:
-    with st.spinner(lbl_training_msg):
-        H_list_init, gsvd_init = generate_and_fit_model(K, document_counts, I, Q, max_iter)
-        st.session_state["H_list"] = H_list_init
-        st.session_state["gsvd"] = gsvd_init
-        st.session_state["fit_duration"] = 0.45
-        st.session_state["trained_params"] = (K, document_counts, I, Q, max_iter)
+    # Use cached default model to avoid ANY spinner or calculation on first load!
+    H_list_init, gsvd_init = generate_and_fit_model(DEFAULT_K, DEFAULT_COUNTS, DEFAULT_I, DEFAULT_Q, DEFAULT_MAX_ITER)
+    st.session_state["H_list"] = H_list_init
+    st.session_state["gsvd"] = gsvd_init
+    st.session_state["fit_duration"] = 0.45
+    st.session_state["trained_params"] = (DEFAULT_K, list(DEFAULT_COUNTS), DEFAULT_I, DEFAULT_Q, DEFAULT_MAX_ITER)
 
 # Detect if the sliders currently differ from the last trained state
 current_params = (K, document_counts, I, Q, max_iter)
@@ -282,7 +291,7 @@ run_button = st.sidebar.button(lbl_fit_btn, type="primary")
 if run_button:
     with st.spinner(lbl_training_msg):
         start_time = time.time()
-        H_list_new, gsvd_new = generate_and_fit_model(K, document_counts, I, Q, max_iter)
+        H_list_new, gsvd_new = generate_and_fit_model(K, tuple(document_counts), I, Q, max_iter)
         fit_duration = time.time() - start_time
         
         st.session_state["H_list"] = H_list_new
