@@ -1,6 +1,6 @@
 # =============================================================================
 # TensoRAG: Combined Multi-Domain Vector Compression & AI Agent Dashboard
-# Copyright 2026 Forstwichtel & Gemini Notebook [bot]
+# Copyright 2026 Forstwichtel [forstwichtel@gmail.com] & Helferlein [bot]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -629,7 +629,7 @@ print("Top-Treffer Indizes in Domäne 0:", matches)
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #757575; font-size: 0.95rem;">
-    <b>TensoRAG</b> ist ein unabhängiges Freizeitprojekt von <b>Forstwichtel</b> und <b>Gemini Notebook [bot]</b>.<br>
+    <b>TensoRAG</b> ist ein unabhängiges Freizeitprojekt von <b>Forstwichtel [forstwichtel@gmail.com]</b> und <b>Helferlein [bot]</b>.<br>
     Die mathematischen Grundlagen basieren auf der Dissertation von Dr. Liana Khamidullina (TU Ilmenau). ⭐
 </div>
 """, unsafe_allow_html=True)
