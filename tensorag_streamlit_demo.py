@@ -1,5 +1,5 @@
 # =============================================================================
-# TensoRAG: Interactive Vector Compression & Multi-Domain RAG Dashboard
+# TensoRAG: Combined Multi-Domain Vector Compression & AI Agent Dashboard
 # Copyright 2026 Forstwichtel & Gemini Notebook [bot]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,15 +22,15 @@ import time
 import os
 import sys
 
-# Set page layout to wide for a beautiful dashboard look
+# Set page layout to wide for a professional dashboard look
 st.set_page_config(
-    page_title="TensoRAG - Multilinear GSVD Vector Compression Demo",
-    page_icon="🚀",
+    page_title="TensoRAG - Multilineare GSVD Vektorkompression & Agentendemo",
+    page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for styling metrics and cards
+# Custom CSS for styling metrics, cards, and agent bubbles
 st.markdown("""
 <style>
     .metric-card {
@@ -67,13 +67,43 @@ st.markdown("""
         font-weight: 600;
         font-size: 1.1rem;
     }
+    .agent-bubble {
+        background-color: #f1f3f4;
+        padding: 15px;
+        border-radius: 15px;
+        border-left: 5px solid #1a73e8;
+        margin-bottom: 15px;
+    }
+    .thought-bubble {
+        background-color: #fff8e1;
+        padding: 15px;
+        border-radius: 15px;
+        border-left: 5px solid #ffb300;
+        margin-bottom: 15px;
+        font-family: monospace;
+    }
+    .user-bubble {
+        background-color: #e8f0fe;
+        padding: 15px;
+        border-radius: 15px;
+        border-left: 5px solid #4285f4;
+        margin-bottom: 15px;
+        text-align: right;
+    }
+    .tool-tag {
+        background-color: #e6f4ea;
+        color: #137333;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # Helper for robust class imports
 @st.cache_resource
 def load_gsvd_class():
-    # Attempt importing from standard paths
     try:
         from tensorag import MultilinearGSVD
         return MultilinearGSVD
@@ -141,49 +171,47 @@ def load_gsvd_class():
 MultilinearGSVD = load_gsvd_class()
 
 # Title and introduction
-st.title("🚀 TensoRAG: Interactive Vector Compression Engine")
+st.title("🚀 TensoRAG: Interaktive Vektorkompression & Agentensimulation")
 st.markdown("""
-### Multilinear Generalized SVD (ML-GSVD) in Action
-This dashboard lets you simulate multiple independent knowledge domains (e.g., HR Policies, Financial Reports, Technical Specs) 
-and compress their high-dimensional vector embeddings simultaneously using **TensoRAG**. 
-By capturing the shared global semantics in a **common right basis $\\mathbf{A}$**, we compress your vector database's footprint 
-while preserving the precise geometric layout of individual files.
+### Multilineare Generalisierte SVD (ML-GSVD) in der Praxis
+Diese App demonstriert, wie unabhängige Wissensdatenbanken (z. B. HR-Richtlinien, Finanzberichte, Technische Dokumente) 
+simultan komprimiert werden können. Durch die Extraktion einer **gemeinsamen globalen Basis $\\mathbf{A}$** reduzieren wir den 
+Speicherbedarf der Vektordatenbank drastisch und beschleunigen die Suche, ohne die semantische Genauigkeit der lokalen Dokumente zu beeinträchtigen.
 """)
 
 # Setup Sidebar for parameters
-st.sidebar.header("⚙️ Simulation Settings")
+st.sidebar.header("⚙️ Simulations-Einstellungen")
 
-K = st.sidebar.slider("Number of Domains (Slices)", min_value=2, max_value=5, value=3)
+K = st.sidebar.slider("Anzahl der Domänen (K)", min_value=2, max_value=5, value=3)
 
 # Define domain configurations based on selected K
-domain_labels = ["HR Policies", "Financial Reports", "Technical Specs", "Legal Clauses", "Customer Support"][:K]
+domain_labels = ["HR-Richtlinien", "Finanzberichte", "Technische Dokumentation", "Rechtliche Klauseln", "Kundensupport"][:K]
 document_counts = []
-st.sidebar.subheader("📄 Document Count per Domain")
+st.sidebar.subheader("📄 Dokumentenanzahl pro Domäne")
 for i, label in enumerate(domain_labels):
-    count = st.sidebar.slider(f"{label} (Documents)", min_value=30, max_value=300, value=[120, 90, 150, 100, 80][i])
+    count = st.sidebar.slider(f"{label} (Dokumente)", min_value=30, max_value=300, value=[120, 90, 150, 100, 80][i])
     document_counts.append(count)
 
-st.sidebar.subheader("📊 Embedding Setup")
-I = st.sidebar.selectbox("Original Embedding Dimension (d)", options=[256, 512, 1024, 1536, 3072], index=3)
-Q = st.sidebar.slider("Target Compressed Subspace (Q)", min_value=16, max_value=256, value=128, step=16)
+st.sidebar.subheader("📊 Einbettungs-Setup")
+I = st.sidebar.selectbox("Ursprüngliche Dimension (d)", options=[256, 512, 1024, 1536, 3072], index=3)
+Q = st.sidebar.slider("Ziel-Dimension (Q)", min_value=16, max_value=256, value=128, step=16)
 
 if Q >= I:
-    st.sidebar.error(f"Error: Target rank Q ({Q}) must be strictly less than original dimension d ({I}) for compression.")
+    st.sidebar.error(f"Fehler: Die Ziel-Dimension Q ({Q}) muss strikt kleiner sein als die ursprüngliche Dimension d ({I}).")
     st.stop()
 
-max_iter = st.sidebar.slider("Max ALS Iterations", min_value=5, max_value=50, value=25)
+max_iter = st.sidebar.slider("Max. ALS Iterationen", min_value=5, max_value=50, value=25)
 
 # Session state initialization to cache generated data and model
 if "data_generated" not in st.session_state or st.session_state.get("prev_params") != (K, document_counts, I, Q):
     st.session_state["data_generated"] = False
 
 # Trigger Button
-run_button = st.sidebar.button("⚡ Run TensoRAG Compression", type="primary")
+run_button = st.sidebar.button("⚡ TensoRAG-Kompression starten", type="primary")
 
 if run_button or not st.session_state["data_generated"]:
-    with st.spinner("Generating synthetic domain embeddings and training TensoRAG model..."):
+    with st.spinner("Generiere synthetische Domänen-Vektoren und trainiere TensoRAG-Modell..."):
         # 1. Generate realistic synthetic semantic embeddings
-        # We model a RAG scenario where domains share a global semantic subspace, but have their own local variations
         np.random.seed(42)
         shared_dimensions = 50
         shared_structure = np.random.randn(shared_dimensions, I)
@@ -224,7 +252,6 @@ ram_savings_pct = (1.0 - (compressed_floats / original_floats)) * 100
 compression_ratio = original_floats / compressed_floats
 
 # Simulate search performance to find latency and speedup
-# Perform 200 dummy lookups in original vs compressed space to get an accurate average latency
 import timeit
 q_vector = H_list[0][0, :] # Use first document as query for speedup benchmark
 def orig_search():
@@ -249,16 +276,16 @@ col_m1, col_m2, col_m3 = st.columns(3)
 with col_m1:
     st.markdown(f"""
     <div class="metric-card">
-        <div class="metric-label">💾 Physical RAM Reduction</div>
+        <div class="metric-label">💾 RAM-Reduzierung</div>
         <div class="metric-value">{ram_savings_pct:.1f}%</div>
-        <div class="metric-delta">Saved <b>{(original_floats - compressed_floats)*4/1024:.1f} KB</b> (Faktor {compression_ratio:.1f}x kompakter)</div>
+        <div class="metric-delta">Eingespart: <b>{(original_floats - compressed_floats)*4/1024:.1f} KB</b> ({compression_ratio:.1f}x kompakter)</div>
     </div>
     """, unsafe_allow_html=True)
 
 with col_m2:
     st.markdown(f"""
     <div class="metric-card">
-        <div class="metric-label">⚡ Vector Search Speedup</div>
+        <div class="metric-label">⚡ Such-Beschleunigung</div>
         <div class="metric-value">{search_speedup:.1f}x</div>
         <div class="metric-delta">Original: {t_orig:.4f} ms | TensoRAG: {t_comp:.4f} ms</div>
     </div>
@@ -267,36 +294,36 @@ with col_m2:
 with col_m3:
     st.markdown(f"""
     <div class="metric-card">
-        <div class="metric-label">⏱️ Fitting Execution</div>
+        <div class="metric-label">⏱️ Trainingsdauer (Fit)</div>
         <div class="metric-value">{fit_duration:.2f}s</div>
-        <div class="metric-delta">Model convergence reached in {len(gsvd.errors)} ALS iterations</div>
+        <div class="metric-delta">Konvergenz erreicht in {len(gsvd.errors)} ALS-Iterationen</div>
     </div>
     """, unsafe_allow_html=True)
 
 # Main layout divided into Tabs
-tab_search, tab_mem, tab_math, tab_code = st.tabs([
-    "🔍 Interactive Search Validation", 
-    "📊 Storage & Memory Analysis", 
-    "📈 Mathematical Insights", 
-    "💻 Code Implementation"
+tab_search, tab_mem, tab_agent, tab_math, tab_code = st.tabs([
+    "🔍 Interaktive Validierung", 
+    "📊 Speicher-Analyse", 
+    "🤖 KI-Agenten-Simulation",
+    "📈 Mathematische Einblicke", 
+    "💻 Code-Implementierung"
 ])
 
 # ----------------- TAB 1: INTERACTIVE SEARCH VALIDATION -----------------
 with tab_search:
-    st.subheader("Simulate a Live RAG Document Query")
-    st.markdown("""
-    Select a domain and pick one of its documents as your search query. 
-    We will perform the similarity search twice: once in the slow **original {0}-dimensional space** and once in the compressed **TensoRAG {1}-dimensional space**.
-    """.format(I, Q))
+    st.subheader("Simuliere eine Dokumenten-Suche (Retrieval)")
+    st.markdown(f"""
+    Wähle eine Domäne und eines ihrer Dokumente aus, um eine Suchanfrage zu simulieren. 
+    Wir führen die Ähnlichkeitssuche zweifach aus: einmal im **originalen {I}-dimensionalen Raum** und einmal im komprimierten **{Q}-dimensionalen TensoRAG-Raum**.
+    """)
     
     col_s1, col_s2 = st.columns([1, 3])
     
     with col_s1:
-        selected_domain_idx = st.selectbox("Select Domain", options=range(K), format_func=lambda x: domain_labels[x])
+        selected_domain_idx = st.selectbox("Domäne wählen", options=range(K), format_func=lambda x: domain_labels[x], key="search_domain_select")
         total_docs = H_list[selected_domain_idx].shape[0]
-        selected_doc_idx = st.slider("Select Query Document Index", min_value=0, max_value=total_docs - 1, value=0)
-        
-        top_n = st.slider("Number of Top Matches (k)", min_value=3, max_value=10, value=5)
+        selected_doc_idx = st.slider("Dokumenten-Index (Suchanfrage)", min_value=0, max_value=total_docs - 1, value=0)
+        top_n = st.slider("Anzahl der Top-Matches (k)", min_value=3, max_value=10, value=5)
         
     with col_s2:
         query_vec = H_list[selected_domain_idx][selected_doc_idx, :]
@@ -306,7 +333,6 @@ with tab_search:
         orig_similarities = np.dot(db_vectors, query_vec) / (
             np.linalg.norm(db_vectors, axis=1) * np.linalg.norm(query_vec)
         )
-        # Exclude query document itself from matches for better illustration
         orig_similarities[selected_doc_idx] = -1.0
         top_k_orig_idx = np.argsort(orig_similarities)[::-1][:top_n]
         top_k_orig_sims = orig_similarities[top_k_orig_idx]
@@ -330,80 +356,80 @@ with tab_search:
         col_res1, col_res2 = st.columns(2)
         
         with col_res1:
-            st.markdown(f"##### 🔴 Original Search (Dimension d = {I})")
+            st.markdown(f"##### 🔴 Originale Suche (Dimension d = {I})")
             orig_df = pd.DataFrame({
-                "Doc ID": [f"Doc #{idx}" for idx in top_k_orig_idx],
-                "Cosine Similarity": [f"{s:.4f}" for s in top_k_orig_sims]
+                "Dokumenten-ID": [f"Dokument #{idx}" for idx in top_k_orig_idx],
+                "Cosinus-Ähnlichkeit": [f"{s:.4f}" for s in top_k_orig_sims]
             })
             st.dataframe(orig_df, use_container_width=True)
             
         with col_res2:
-            st.markdown(f"##### 🟢 Compressed Search (Dimension Q = {Q})")
+            st.markdown(f"##### 🟢 Komprimierte Suche (Dimension Q = {Q})")
             comp_df = pd.DataFrame({
-                "Doc ID": [f"Doc #{idx}" for idx in top_k_comp_idx],
-                "Cosine Similarity": [f"{s:.4f}" for s in top_k_comp_sims],
-                "Match Status": ["✅ Direct Match" if idx in top_k_orig_idx else "⚠️ Near Match" for idx in top_k_comp_idx]
+                "Dokumenten-ID": [f"Dokument #{idx}" for idx in top_k_comp_idx],
+                "Cosinus-Ähnlichkeit": [f"{s:.4f}" for s in top_k_comp_sims],
+                "Status": ["✅ Exakter Treffer" if idx in top_k_orig_idx else "⚠️ Ähnlicher Treffer" for idx in top_k_comp_idx]
             })
             st.dataframe(comp_df, use_container_width=True)
             
         # Display overlap visualization
-        st.markdown(f"#### 🎯 Semantic Alignment: **{recall_pct:.0f}%** Recall")
+        st.markdown(f"#### 🎯 Semantische Abdeckung (Recall): **{recall_pct:.0f}%**")
         st.progress(recall_pct / 100.0)
         st.markdown(f"""
-        * **Result:** **{len(overlap)} of your top {top_n} matching documents** are exactly identical. 
-        * This demonstrates that TensoRAG preserves the semantic spatial orientation of documents in their local domains, allowing search to yield the exact same results at a fraction of the search time and memory footprints!
+        * **Ergebnis:** **{len(overlap)} der Top {top_n} übereinstimmenden Dokumente** wurden im komprimierten Raum exakt identisch gefunden. 
+        * Dies zeigt, dass TensoRAG die geometrische Anordnung und Verwandtschaft der lokalen Dokumente hervorragend bewahrt – bei einem Bruchteil des Speicherbedarfs!
         """)
 
 # ----------------- TAB 2: STORAGE & MEMORY ANALYSIS -----------------
 with tab_mem:
-    st.subheader("Physical Storage footprint Breakdown")
+    st.subheader("Analyse des physischen Speicherbedarfs")
     
     col_p1, col_p2 = st.columns([2, 3])
     
     with col_p1:
         st.markdown("""
-        ### Why is TensoRAG so space-efficient?
-        Traditional databases store full, uncompressed high-dimensional vectors for every single document in every domain.
+        ### Warum spart TensoRAG so viel Platz?
+        Klassische Vektordatenbanken speichern für jedes einzelne Dokument in jeder Domäne den vollständigen, unkomprimierten Vektor ab.
         
-        **TensoRAG's Shared Subspace Formula:**
-        Instead of saving $\\mathbf{H}_k \\in \\mathbb{R}^{J_k \\times I}$, we factorize the dataset. We store:
-        1. **$\\mathbf{A}$ (Shared Right Basis):** Size $I \\times Q$. Only stored **once** globally for all domains!
-        2. **$\\mathbf{B}_k$ (Orthogonal Left Factors):** Size $J_k \\times Q$ per domain. Very compact since $Q \\ll I$.
-        3. **$\\mathbf{C}_k$ (Singular values):** $Q$ coefficients per domain.
+        **Die Zerlegungsformel von TensoRAG:**
+        Anstatt der vollständigen Matrizen $\\mathbf{H}_k \\in \\mathbb{R}^{J_k \\times I}$ speichern wir die Faktoren:
+        1. **$\\mathbf{A}$ (Gemeinsame Basis):** Größe $I \\times Q$. Wird **nur einmal** global für alle Domänen gespeichert!
+        2. **$\\mathbf{B}_k$ (Orthogonale Faktoren):** Größe $J_k \\times Q$ pro Domäne. Extrem kompakt, da $Q \\ll I$.
+        3. **$\\mathbf{C}_k$ (Skalierungswerte):** $Q$ Koeffizienten pro Domäne.
         
-        This multi-domain parameter sharing is what yields spectacular memory savings as your database scales.
+        Dieses geteilte Basis-Modell führt bei einer steigenden Anzahl von Domänen und Dokumenten zu immer größeren relativen Speichereinsparungen.
         """)
         
     with col_p2:
         # Create storage comparison data
         sizes_data = {
-            "Representation": ["Original Database", "TensoRAG Basis (A)", "TensoRAG Slices (B + C)"],
-            "Storage Size (Float Values)": [original_floats, basis_size, factors_size + scales_size]
+            "Datenrepräsentation": ["Originale Datenbank", "TensoRAG-Basis (A)", "TensoRAG-Faktoren (B + C)"],
+            "Physische Float-Werte": [original_floats, basis_size, factors_size + scales_size]
         }
         sizes_df = pd.DataFrame(sizes_data)
         
-        st.markdown("##### Storage Footprint: Original vs. TensoRAG Factors")
-        st.bar_chart(data=sizes_df, x="Representation", y="Storage Size (Float Values)", use_container_width=True)
+        st.markdown("##### Speicherplatz: Original vs. TensoRAG-Faktoren")
+        st.bar_chart(data=sizes_df, x="Datenrepräsentation", y="Physische Float-Werte", use_container_width=True)
         
         # Detailed table of sizes
-        st.markdown("##### Structural Memory Allocation Breakdown:")
+        st.markdown("##### Detaillierte Speicheraufteilung:")
         detail_df = pd.DataFrame({
-            "Component / Matrix": ["Original Uncompressed", "Shared Subspace Basis (A)", "Left Factors (B_k)", "Coefficients (C_k)", "Total TensoRAG Size"],
-            "Dimensions": [
-                f"K matrices of size (J_k x {I})",
+            "Komponente / Matrix": ["Original Unkomprimiert", "Globale Basis (A)", "Linke Faktoren (B_k)", "Koeffizienten (C_k)", "Gesamter TensoRAG-Speicher"],
+            "Dimensionen": [
+                f"K Matrizen der Größe (J_k x {I})",
                 f"({I} x {Q})",
                 " + ".join([f"({dim} x {Q})" for dim in document_counts]),
                 f"({K} x {Q})",
                 "-"
             ],
-            "Floats Stored": [
+            "Float-Werte": [
                 original_floats,
                 basis_size,
                 factors_size,
                 scales_size,
                 compressed_floats
             ],
-            "Memory (KB)": [
+            "Speicherbedarf (KB)": [
                 f"{original_floats*4/1024:.1f} KB",
                 f"{basis_size*4/1024:.1f} KB",
                 f"{factors_size*4/1024:.1f} KB",
@@ -413,18 +439,114 @@ with tab_mem:
         })
         st.dataframe(detail_df, use_container_width=True)
 
-# ----------------- TAB 3: MATHEMATICAL INSIGHTS -----------------
+# ----------------- TAB 3: AI AGENT SIMULATION -----------------
+with tab_agent:
+    st.subheader("Simulierte KI-Agenten-Umgebung")
+    st.markdown("""
+    Hier wird simuliert, wie ein KI-Agent ein integriertes **TensoRAG-Modell** als Suchwerkzeug (Tool) für sein Wissensgedächtnis verwendet.
+    Der Agent sucht **nicht** im speicherintensiven Originalraum (1536 Dimensionen), sondern greift auf das kompakte, 128-dimensionale Gedächtnis zu.
+    """)
+
+    # Local Preset scenarios
+    agent_scenarios = {
+        "Wie viel Reisebudget hat die Tech-Abteilung?": {
+            "domain_idx": 1,
+            "search_term": "reisebudget tech",
+            "thought": "Der Nutzer fragt nach dem Reisebudget der Tech-Abteilung. Ich muss in den Finanzberichten (Domäne 1) suchen.",
+            "tool_call": "compressed_vector_search('reisebudget tech', domain='Finanzberichte')",
+            "retrieved_doc": "Finanzbericht Absatz 14: Das jährliche Reisebudget für die Tech-Entwickler beträgt maximal 15.000 € pro Team für Konferenzreisen.",
+            "answer": "Laut dem Finanzbericht (Absatz 14) beläuft sich das jährliche Reisebudget für das Tech-Team auf maximal 15.000 € für Konferenzen und Dienstreisen."
+        },
+        "Wie hoch ist der Urlaubsanspruch bei einer 5-Tage-Woche?": {
+            "domain_idx": 0,
+            "search_term": "urlaubstage 5-tage-woche",
+            "thought": "Die Frage bezieht sich auf Urlaubsanspruch. Das fällt unter HR-Richtlinien (Domäne 0). Ich starte eine Suche in den HR-Vektoren.",
+            "tool_call": "compressed_vector_search('urlaubstage 5-tage-woche', domain='HR-Richtlinien')",
+            "retrieved_doc": "HR-Handbuch S. 8: Alle Vollzeitmitarbeiter im Rahmen einer regulären 5-Tage-Woche haben Anspruch auf 30 Tage bezahlten Erholungsurlaub pro Kalenderjahr.",
+            "answer": "Gemäß dem HR-Handbuch (S. 8) haben alle Vollzeitbeschäftigten bei einer regulären 5-Tage-Woche einen Anspruch auf 30 Tage bezahlten Erholungsurlaub im Jahr."
+        },
+        "Welche Backup-Strategie gilt für die Cloud-Datenbanken?": {
+            "domain_idx": 2,
+            "search_term": "backup cloud datenbank",
+            "thought": "Hier geht es um IT-Infrastruktur und Datenbanken. Ich muss in der Technischen Dokumentation (Domäne 2) nach 'Backup' suchen.",
+            "tool_call": "compressed_vector_search('backup cloud datenbank', domain='Technische Dokumentation')",
+            "retrieved_doc": "Tech-Infrastruktur-Doku Abs. 4.2: Alle produktiven Cloud-Datenbanken werden stündlich inkrementell gesichert. Ein vollständiges georedundantes Backup erfolgt täglich um 02:00 UTC.",
+            "answer": "Entsprechend der technischen Dokumentation (Abschnitt 4.2) werden produktive Cloud-Datenbanken stündlich inkrementell gesichert, ergänzt durch ein tägliches georedundantes Voll-Backup um 02:00 UTC."
+        }
+    }
+
+    selected_query = st.selectbox("Frage an den Agenten auswählen:", list(agent_scenarios.keys()), key="agent_query_select")
+    
+    if st.button("⚡ Agenten-Simulation starten", type="primary", key="run_agent_btn"):
+        scenario = agent_scenarios[selected_query]
+        
+        st.markdown("### 💬 Interaktiver Ablaufplan des Agenten")
+        
+        # 1. User Message
+        st.markdown(f"""
+        <div class="user-bubble">
+            <b>Du:</b><br>{selected_query}
+        </div>
+        """, unsafe_allow_html=True)
+        
+        with st.spinner("Agent analysiert die Frage..."):
+            time.sleep(0.8)
+            
+        # 2. Agent Thoughts
+        st.markdown(f"""
+        <div class="thought-bubble">
+            <b>🧠 GEDANKENGANG DES AGENTEN (Thought):</b><br>
+            "{scenario['thought']}"<br><br>
+            <b>⚙️ AKTION:</b> Rufe registriertes Suchwerkzeug auf: <span class="tool-tag">{scenario['tool_call']}</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        with st.spinner("Sende Vektor-Anfrage an komprimierte TensoRAG-Datenbank..."):
+            time.sleep(1.0)
+            
+            # Simulated real mathematical projection
+            q_vec_agent = np.random.randn(I)
+            start_time_agent = time.time()
+            q_proj_agent = q_vec_agent @ gsvd.A
+            db_proj_agent = gsvd.B[scenario['domain_idx']]
+            _ = np.dot(db_proj_agent, q_proj_agent)
+            search_duration_agent_ms = (time.time() - start_time_agent) * 1000
+            
+        # 3. Tool Result / Observation
+        st.markdown(f"""
+        <div class="thought-bubble" style="border-left: 5px solid #137333; background-color: #f6fbf7;">
+            <b>📥 RÜCKMELDUNG DES WERKZEUGS (Observation):</b><br>
+            <i>Suche abgeschlossen in <b>{search_duration_agent_ms:.4f} ms</b> (im kompakten {Q}-dimensionalen Raum)</i><br><br>
+            <b>Gefundener Dokumentenabschnitt (höchste Ähnlichkeit):</b><br>
+            "{scenario['retrieved_doc']}"
+        </div>
+        """, unsafe_allow_html=True)
+        
+        with st.spinner("Verarbeite Dokumententext und generiere Antwort..."):
+            time.sleep(0.8)
+            
+        # 4. Final Agent Answer
+        st.markdown(f"""
+        <div class="agent-bubble">
+            <b>🤖 Agent:</b><br>
+            {scenario['answer']}
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.success(f"Erfolgreich ausgeführt! Das komprimierte Gedächtnis sparte bei dieser Abfrage ca. {ram_savings_pct:.1f}% RAM im Vergleich zur Standard-Suche.")
+
+# ----------------- TAB 4: MATHEMATICAL INSIGHTS -----------------
 with tab_math:
-    st.subheader("Mathematical SVD Diagnostics")
+    st.subheader("Mathematische Diagnostik & Energien")
     
     col_d1, col_d2 = st.columns(2)
     
     with col_d1:
-        st.markdown("##### 📈 Coefficient Energy Distribution (Singular Value Decay)")
+        st.markdown("##### 📈 Energieverteilung der Koeffizienten (Singular Value Decay)")
         st.markdown("""
-        The diagonal coefficients in $\\mathbf{C}_k$ act as the generalized singular values for each specific domain. 
-        If the curves decay rapidly, it proves that the semantic information of your dataset is successfully compressed 
-        into the top principal directions, justifying the choice of a low-rank target $Q$.
+        Die diagonalen Koeffizienten in $\\mathbf{C}_k$ fungieren als verallgemeinerte Singulärwerte für jede spezifische Domäne. 
+        Ein rascher Abfall der Kurven beweist, dass die wesentlichen semantischen Informationen in den führenden Dimensionen 
+        konzentriert sind, was die Wahl eines niedrigen Ranges $Q$ mathematisch rechtfertigt.
         """)
         
         # Generate chart for coefficients
@@ -436,70 +558,70 @@ with tab_math:
         st.line_chart(coef_df, use_container_width=True)
         
     with col_d2:
-        st.markdown("##### 📉 ALS Model Optimization Convergence Curve")
+        st.markdown("##### 📉 ALS-Modell-Konvergenzverlauf")
         st.markdown("""
-        TensoRAG uses an iterative **Alternating Least Squares (ALS)** optimization routine. 
-        The graph below plots the joint reconstruction error across all domain slices per iteration, \n        illustrating how the model rapidly converges toward its numerical optimum.
+        TensoRAG verwendet ein iteratives **Alternating Least Squares (ALS)** Optimierungsverfahren. 
+        Die folgende Grafik zeigt den Verlauf des quadratischen Rekonstruktionsfehlers über alle Domänenslices hinweg 
+        und illustriert die schnelle, stabile numerische Konvergenz des Modells.
         """)
         
         error_df = pd.DataFrame({
-            "Iteration": list(range(1, len(gsvd.errors) + 1)),
-            "Total Sum-of-Squares Error": gsvd.errors
-        }).set_index("Iteration")
+            "Iterationen": list(range(1, len(gsvd.errors) + 1)),
+            "Gesamter Rekonstruktionsfehler": gsvd.errors
+        }).set_index("Iterationen")
         
         st.line_chart(error_df, use_container_width=True)
 
-# ----------------- TAB 4: HOW TO DEPLOY -----------------
+# ----------------- TAB 5: HOW TO DEPLOY -----------------
 with tab_code:
-    st.subheader("🚀 Deploy TensoRAG to your RAG Search Pipeline")
+    st.subheader("🚀 Code-Implementierung für dein eigenes RAG-System")
     st.markdown("""
-    To integrate TensoRAG's ultra-fast, low-memory search in your Python applications, copy and use this production-ready code snippet.
-    This bypasses reconstructing the huge original matrices and runs searches directly in the lightweight compressed coordinate space!
+    Um die ultraschnelle und speichereffiziente Suche von TensoRAG direkt in deine eigene Anwendung einzubauen, 
+    kannst du diesen bereinigten Python-Code kopieren. Die Ähnlichkeitssuche läuft damit vollständig im kompakten Koordinatenraum!
     """)
     
     deploy_code = f"""import numpy as np
 from tensorag import MultilinearGSVD
 
-# 1. Initialize and Fit model using your high-dimensional database embedding matrices
-# H_list contains K domain matrices, each of shape (num_documents, {I})
+# 1. Modell initialisieren und trainieren
+# H_list enthält K Domänen-Matrizen, jeweils mit der Form (Anzahl_Dokumente, {I})
 gsvd = MultilinearGSVD(target_rank={Q}, max_iter=25, tol=1e-5)
 gsvd.fit(H_list)
 
-# 2. Extract compressed database matrices
-# Instead of storing raw high-dimensional embeddings, you only store these factors:
-A_basis = gsvd.A  # Shared Basis, Shape ({I}, {Q})
+# 2. Komprimierte Datenbank-Faktoren extrahieren
+# Anstatt riesige Vektoren zu speichern, sichern wir nur diese Faktoren:
+A_basis = gsvd.A  # Gemeinsame globale Basis, Dimension ({I}, {Q})
 compressed_db_slices = []
 for k in range({K}):
-    # Pre-compute the compressed coordinate database for each domain slice k
-    # Shape: (num_documents_k, {Q})
+    # Berechne die kompakten Koordinaten für jeden Domänen-Slice k
+    # Dimension: (Anzahl_Dokumente_k, {Q})
     compressed_db = gsvd.B[k] @ np.diag(gsvd.C[k, :])
     compressed_db_slices.append(compressed_db)
 
-# 3. Fast Compressed Search Function
+# 3. Ultraschnelle Suchfunktion im komprimierten Raum
 def query_compressed_database(query_vector, domain_index, top_k=5):
     \"\"\"
-    Performs a cosine similarity search on the compressed database in O(Q) time instead of O(d).
+    Führt eine Cosinus-Ähnlichkeitssuche im Q-dimensionalen Raum statt im d-dimensionalen Raum aus.
     \"\"\"
-    # Project raw high-dimensional query into the shared subspace: d-dim -> Q-dim
-    query_projected = query_vector @ A_basis  # Shape: ({Q},)
+    # Projiziere die hochdimensionale Suchanfrage in die gemeinsame Basis: d-dim -> Q-dim
+    query_projected = query_vector @ A_basis  # Dimension: ({Q},)
     
-    # Retrieve pre-computed compressed database slice
+    # Hole die vorkomprimierte Datenbank für die gewünschte Domäne k
     db_projected = compressed_db_slices[domain_index]
     
-    # Calculate cosine similarity in compressed Q-dimensional space
+    # Berechne Cosinus-Ähnlichkeit im kompakten Q-dimensionalen Raum
     similarities = np.dot(db_projected, query_projected) / (
         np.linalg.norm(db_projected, axis=1) * np.linalg.norm(query_projected)
     )
     
-    # Get top matching document indices
+    # Top-k Indizes extrahieren
     top_indices = np.argsort(similarities)[::-1][:top_k]
     return top_indices, similarities[top_indices]
 
-# Test a search run
-# Give a query vector from the wild (shape: {I},)
+# Beispiel-Suchlauf ausführen
 wild_query = np.random.randn({I})
 matches, scores = query_compressed_database(wild_query, domain_index=0, top_k=5)
-print("Top Document Matches in HR Domain:", matches)
+print("Top-Treffer Indizes in Domäne 0:", matches)
 """
     st.code(deploy_code, language="python")
 
@@ -507,7 +629,7 @@ print("Top Document Matches in HR Domain:", matches)
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #757575; font-size: 0.95rem;">
-    <b>TensoRAG</b> is an independent hobby project developed by <b>Forstwichtel</b> and <b>Gemini Notebook [bot]</b>.<br>
-    The mathematics are based on the PhD dissertation of Dr. Liana Khamidullina (TU Ilmenau). Please consider starring the repository on GitHub! ⭐
+    <b>TensoRAG</b> ist ein unabhängiges Freizeitprojekt von <b>Forstwichtel</b> und <b>Gemini Notebook [bot]</b>.<br>
+    Die mathematischen Grundlagen basieren auf der Dissertation von Dr. Liana Khamidullina (TU Ilmenau). ⭐
 </div>
 """, unsafe_allow_html=True)
