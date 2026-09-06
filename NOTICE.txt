@@ -1,0 +1,27 @@
+Multilineare GSVD-Kompression (ml_gsvd)
+Copyright 2026 [Ihr Name / Ihr Unternehmen]
+
+This product includes software developed by [Ihr Name / Ihr Unternehmen].
+
+--------------------------------------------------------------------------------
+ACADEMIC ATTRIBUTION & ORIGINAL RESEARCH ACKNOWLEDGEMENT
+--------------------------------------------------------------------------------
+The mathematical algorithms and theoretical foundations implemented in this 
+software are based on the pioneer academic research on Multilinear Generalized 
+Singular Value Decomposition (ML-GSVD) by:
+
+- Dr. Liana Khamidullina (Technische Universität Ilmenau)
+- Prof. Dr. Martin Haardt (Technische Universität Ilmenau)
+
+Specifically, this implementation derives from the algorithms and formulations 
+presented in:
+
+Khamidullina, L., 2024. "Tensor decompositions and algorithms for efficient 
+multidimensional signal processing." Dissertation, Technische Universität Ilmenau.
+URN: urn:nbn:de:gbv:ilm1-2024000104
+DOI: 10.22032/dbt.59389
+
+L. Khamidullina, A. L. F. de Almeida and M. Haardt, "Multilinear Generalized 
+Singular Value Decomposition (ML-GSVD) and Its Application to Multiuser 
+MIMO Systems," in IEEE Transactions on Signal Processing, vol. 70, 
+pp. 2783-2797, 2022, doi: 10.1109/TSP.2022.3178902.
