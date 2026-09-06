@@ -20,8 +20,8 @@ Eine hochperformante Python/NumPy-Implementierung der **Multilinearen Verallgeme
 
 ## 👥 Autoren & Mitwirkende
 
-*   **Hauptautor:** Forstwichtel (Pseudonym)
-*   **Ko-Autor:** Gemini Notebook [bot]
+*   **Hauptautor:** Forstwichtel [forstwichtel@gmail.com]
+*   **Co-Autor:** Helferlein [bot]
 
 ---
 
