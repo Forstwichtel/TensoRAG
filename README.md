@@ -4,6 +4,8 @@
   <img src="tensorag_github_logo.png" alt="TensoRAG Logo" width="800">
 </p>
 
+[![Interactive Demo](https://img.shields.io/badge/Streamlit-Interactive_Demo-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://tensorag.streamlit.app/)
+
 A high-performance Python/NumPy implementation of the **Multilinear Generalized Singular Value Decomposition (ML-GSVD)**, based on the pioneering mathematical research of **Dr. Liana Khamidullina** and **Prof. Martin Haardt** (Technische Universität Ilmenau).
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
