@@ -118,3 +118,8 @@ This project is licensed under the **Apache License, Version 2.0**. You are free
 ### GDPR / Privacy
 *   **Zero Telemetry:** This code is entirely offline and air-gapped. It does not collect, store, track, or transmit any user metrics, system data, or personal identifiers.
 *   **Privacy-First:** Ensure that any datasets or embeddings you process with this library are fully anonymized. The authors of this repository do not have access to any data you run through this algorithm.
+
+https://github.com/user-attachments/assets/fd4db8e2-47be-4288-af65-cff3a7ec9ba0
+
+https://github.com/user-attachments/assets/23c864a8-338a-425d-9244-f178d0bb7ac4
+
