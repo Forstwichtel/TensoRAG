@@ -119,3 +119,5 @@ Dieses Projekt ist unter der **Apache-Lizenz, Version 2.0** lizenziert. Sie dür
 ### Datenschutz / DSGVO-Konformität
 *   **Keine Telemetrie:** Dieser Code arbeitet zu 100 % offline und lokal. Es werden keinerlei Nutzungsdaten, Systemmetriken oder persönliche Identifikatoren erfasst, gespeichert oder übertragen.
 *   **Privacy-First:** Stellen Sie sicher, dass alle Datensätze oder Embeddings, die Sie mit dieser Bibliothek verarbeiten, vollständig anonymisiert sind. Die Autoren dieses Repositories haben zu keinem Zeitpunkt Zugriff auf Ihre verarbeiteten Daten.
+---
+https://github.com/user-attachments/assets/fd4db8e2-47be-4288-af65-cff3a7ec9ba0
