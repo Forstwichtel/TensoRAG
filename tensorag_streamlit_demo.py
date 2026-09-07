@@ -219,6 +219,26 @@ else:
     lbl_training_msg = "Generating synthetic domain embeddings and training TensoRAG model..."
     lbl_dim_error = "Error: Target dimension Q ({}) must be strictly less than original dimension d ({})."
 
+
+# Render Video Section (Bilingual, under-the-hood CDN hosting)
+st.markdown("---")
+col_vid1, col_vid2 = st.columns(2)
+if is_de:
+    with col_vid1:
+        st.markdown("##### 🪄 Was ist TensoRAG? (Laien-Einführung)")
+        st.video("https://github.com/user-attachments/assets/fd4db8e2-47be-4288-af65-cff3a7ec9ba0")
+    with col_vid2:
+        st.markdown("##### 🧠 Hardware & Speicherhunger (Technischer Deep Dive)")
+        st.video("https://github.com/user-attachments/assets/23c864a8-338a-425d-9244-f178d0bb7ac4")
+else:
+    with col_vid1:
+        st.markdown("##### 🪄 What is TensoRAG? (Layman Introduction)")
+        st.video("https://github.com/user-attachments/assets/fd4db8e2-47be-4288-af65-cff3a7ec9ba0")
+    with col_vid2:
+        st.markdown("##### 🧠 AI Memory Hunger (Technical Deep Dive)")
+        st.video("https://github.com/user-attachments/assets/23c864a8-338a-425d-9244-f178d0bb7ac4")
+st.markdown("---")
+
 # Render Sidebar Sliders
 K = st.sidebar.slider(lbl_domains_count, min_value=2, max_value=5, value=3)
 
