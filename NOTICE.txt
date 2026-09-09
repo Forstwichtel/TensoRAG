@@ -1,0 +1,15 @@
+TensoRAG: Multilinear Generalized Singular Value Decomposition (ML-GSVD)
+Copyright 2026 Forstwichtel & Contributors
+
+This product is an independent implementation based on the published academic research of:
+  - Dr. Liana Khamidullina
+  - Prof. Dr. Martin Haardt
+  Technische Universität Ilmenau, Germany (2022–2024)
+
+Academic Publications Reflected:
+1. L. Khamidullina, A. L. F. de Almeida, and M. Haardt, "Multilinear Generalized Singular Value Decomposition (ML-GSVD) and Its Application to Multiuser MIMO Systems," IEEE Transactions on Signal Processing, vol. 70, pp. 2783-2797, 2022.
+2. Khamidullina, Liana (2024). "Tensor decompositions and algorithms for efficient multidimensional signal processing." Dissertation, Technische Universität Ilmenau.
+
+Licensing & Contact:
+- Free for Academic, Research, Educational, and Non-Commercial Use (PolyForm NonCommercial 1.0.0).
+- Commercial use, enterprise licensing, and inquiries: forstwichtel@gmail.com

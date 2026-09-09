@@ -1,16 +1,19 @@
 # Copyright 2026 Forstwichtel & Gemini Notebook [bot]
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the PolyForm NonCommercial License 1.0.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://polyformproject.org/licenses/noncommercial/1.0.0/
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Project: TensoRAG
+# Authors: Forstwichtel, Gemini Notebook [bot]
 
 import numpy as np
 import time
@@ -20,27 +23,12 @@ import sys
 try:
     from tensorag import MultilinearGSVD
 except ImportError:
-    # Dynamischer Import für v2 aus dem Projektordner
     import importlib.util
-    import os
-    try:
-        if os.path.exists("/workspace/artifacts/tensorag.py"):
-            spec = importlib.util.spec_from_file_location("tensorag", "/workspace/artifacts/tensorag.py")
-        elif os.path.exists("/workspace/out/tensorag.py"):
-            spec = importlib.util.spec_from_file_location("tensorag", "/workspace/out/tensorag.py")
-        else:
-            spec = importlib.util.spec_from_file_location("tensorag", "tensorag.py")
-        tensorag_mod = importlib.util.module_from_spec(spec)
-        sys.modules["tensorag"] = tensorag_mod
-        spec.loader.exec_module(tensorag_mod)
-        MultilinearGSVD = tensorag_mod.MultilinearGSVD
-    except FileNotFoundError:
-        # Lokaler Fallback-Import aus demselben Verzeichnis
-        spec = importlib.util.spec_from_file_location("tensorag", "./tensorag.py")
-        tensorag_mod = importlib.util.module_from_spec(spec)
-        sys.modules["tensorag"] = tensorag_mod
-        spec.loader.exec_module(tensorag_mod)
-        MultilinearGSVD = tensorag_mod.MultilinearGSVD
+    spec = importlib.util.spec_from_file_location("tensorag", "./tensorag.py")
+    tensorag = importlib.util.module_from_spec(spec)
+    sys.modules["tensorag"] = tensorag
+    spec.loader.exec_module(tensorag)
+    MultilinearGSVD = tensorag.MultilinearGSVD
 
 def run_benchmark():
     print("=" * 66)

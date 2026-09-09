@@ -1,10 +1,10 @@
 # Copyright 2026 Forstwichtel & Gemini Notebook [bot]
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the PolyForm NonCommercial License 1.0.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://polyformproject.org/licenses/noncommercial/1.0.0/
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -147,30 +147,145 @@ class MultilinearGSVD:
             raise ValueError("Model is not fitted yet. Call fit() first.")
         return self.B[k] @ np.diag(self.C[k, :]) @ self.A.conj().T
 
+    def transform_query(self, query_vector):
+        """
+        Projects an uncompressed high-dimensional query vector (I,) into 
+        the shared compressed subspace (Q,).
+        
+        q_compressed = q @ A*
+        """
+        if self.A is None:
+            raise ValueError("Model is not fitted yet. Call fit() first.")
+        
+        q = np.asarray(query_vector).squeeze()
+        if q.ndim != 1 or q.shape[0] != self.A.shape[0]:
+            raise ValueError(f"Query vector must have dimension {self.A.shape[0]}, got {q.shape}.")
+            
+        return q @ self.A.conj()
+
+    def search_compressed(self, k, query_compressed, top_k=5):
+        """
+        Executes fast cosine similarity search directly in the compressed Q-dimensional subspace.
+        
+        Parameters:
+            k (int): Index of the domain slice (0 <= k < K).
+            query_compressed (np.ndarray): Compressed query vector of shape (Q,).
+            top_k (int): Number of top documents to retrieve.
+            
+        Returns:
+            indices (np.ndarray): Indices of top_k documents.
+            scores (np.ndarray): Compressed similarity scores.
+        """
+        if self.B is None or self.C is None:
+            raise ValueError("Model is not fitted yet. Call fit() first.")
+            
+        B_k_scaled = self.B[k] * self.C[k, :] # Weight factor matrix by singular values
+        
+        norm_q = np.linalg.norm(query_compressed)
+        norm_B = np.linalg.norm(B_k_scaled, axis=1)
+        
+        similarities = (B_k_scaled @ query_compressed) / (norm_B * norm_q + 1e-10)
+        
+        if len(similarities) > top_k:
+            part_ids = np.argpartition(similarities, -top_k)[-top_k:]
+            sorted_top = part_ids[np.argsort(similarities[part_ids])[::-1]]
+        else:
+            sorted_top = np.argsort(similarities)[::-1]
+            
+        return sorted_top, similarities[sorted_top]
+
+    def two_stage_search(self, k, query_vector, raw_vectors_k, top_k=5, top_n_candidates=30):
+        """
+        Executes Two-Stage Retrieval (Coarse-to-Fine):
+          - Stage 1: Fast candidate selection in compressed Q-dim space using np.argpartition.
+          - Stage 2: Exact rescoring on uncompressed raw_vectors_k for candidates only.
+          
+        Parameters:
+            k (int): Domain slice index.
+            query_vector (np.ndarray): Original uncompressed query vector (I,).
+            raw_vectors_k (np.ndarray): Original uncompressed dataset slice matrix (J_k, I).
+            top_k (int): Number of final top documents to return.
+            top_n_candidates (int): Number of candidates to over-fetch in Stage 1.
+            
+        Returns:
+            final_indices (np.ndarray): Indices of top_k documents.
+            final_scores (np.ndarray): Exact cosine similarity scores.
+        """
+        # Ensure candidate pool is at least top_k
+        top_n_candidates = max(top_k, top_n_candidates)
+        
+        # 1. Project query into compressed subspace
+        q_comp = self.transform_query(query_vector)
+        
+        # 2. Stage 1: Retrieve candidate IDs in compressed space
+        candidate_ids, _ = self.search_compressed(k, q_comp, top_k=top_n_candidates)
+        
+        # 3. Stage 2: Exact rescoring on raw vectors for candidates
+        candidate_vectors = raw_vectors_k[candidate_ids]
+        
+        norm_q = np.linalg.norm(query_vector)
+        norm_candidates = np.linalg.norm(candidate_vectors, axis=1)
+        
+        exact_similarities = (candidate_vectors @ query_vector) / (norm_candidates * norm_q + 1e-10)
+        
+        if len(exact_similarities) > top_k:
+            part_ids = np.argpartition(exact_similarities, -top_k)[-top_k:]
+            sorted_in_candidates = part_ids[np.argsort(exact_similarities[part_ids])[::-1]]
+        else:
+            sorted_in_candidates = np.argsort(exact_similarities)[::-1]
+            
+        final_indices = candidate_ids[sorted_in_candidates]
+        final_scores = exact_similarities[sorted_in_candidates]
+        
+        return final_indices, final_scores
+
 # Quick validation run
 if __name__ == "__main__":
-    print("Verifying TensoRAG ML-GSVD Python Class implementation...")
-    # 4 slices, common column dimension 6, varying row dimensions J_k
+    print("Verifying TensoRAG ML-GSVD Python Class implementation with Two-Stage Retrieval...")
+    # 4 slices, common column dimension 64, varying row dimensions J_k
+    I = 64
     H_test = [
-        np.random.randn(8, 6) + 1j * np.random.randn(8, 6),
-        np.random.randn(7, 6) + 1j * np.random.randn(7, 6),
-        np.random.randn(6, 6) + 1j * np.random.randn(6, 6),
-        np.random.randn(5, 6) + 1j * np.random.randn(5, 6)
+        np.random.randn(200, I),
+        np.random.randn(150, I),
+        np.random.randn(100, I),
+        np.random.randn(180, I)
     ]
     
-    # Run with rank 4
-    gsvd = MultilinearGSVD(target_rank=4, max_iter=50, tol=1e-6, random_state=42)
+    # Run with target rank 16
+    gsvd = MultilinearGSVD(target_rank=16, max_iter=50, tol=1e-6, random_state=42)
     gsvd.fit(H_test)
     
     print(f"Convergence reached after {len(gsvd.errors)} iterations.")
     print(f"Initial Error: {gsvd.errors[0]:.6f} -> Final Error: {gsvd.errors[-1]:.6f}")
     
-    # Validate orthogonality of B_k
-    for k in range(len(H_test)):
-        ortho_check = gsvd.B[k].conj().T @ gsvd.B[k]
-        diff_from_eye = np.linalg.norm(ortho_check - np.eye(4))
-        print(f"Slice {k}: B_k column orthogonality error = {diff_from_eye:.2e}")
-        
-    # Validate normalization of C columns
-    c_col_sq_sums = np.sum(gsvd.C**2, axis=0)
-    print(f"C column squared sums (expected all 1s): {c_col_sq_sums}")
+    # Generate random test query
+    q_test = np.random.randn(I)
+    
+    # Test transform_query
+    q_comp = gsvd.transform_query(q_test)
+    print("Compressed query shape:", q_comp.shape)
+    
+    # Test Stage 1 search
+    cand_ids, cand_scores = gsvd.search_compressed(k=0, query_compressed=q_comp, top_k=10)
+    print("Stage 1 top 5 candidate IDs:", cand_ids[:5])
+    
+    # Test Two-Stage search
+    final_ids, final_scores = gsvd.two_stage_search(
+        k=0, 
+        query_vector=q_test, 
+        raw_vectors_k=H_test[0], 
+        top_k=5, 
+        top_n_candidates=30
+    )
+    print("Two-stage final top 5 IDs:", final_ids)
+    print("Two-stage final top 5 scores:", final_scores)
+    
+    # Compare with exact brute-force search on full raw matrix
+    norm_q = np.linalg.norm(q_test)
+    norm_H0 = np.linalg.norm(H_test[0], axis=1)
+    bf_sims = (H_test[0] @ q_test) / (norm_H0 * norm_q + 1e-10)
+    bf_top5 = np.argsort(bf_sims)[-5:][::-1]
+    print("Brute-force exact top 5 IDs:", bf_top5)
+    
+    overlap = len(set(final_ids).intersection(set(bf_top5)))
+    print(f"Two-stage recall overlap with brute-force: {overlap}/5")

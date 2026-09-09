@@ -1,0 +1,52 @@
+POLYFORM NONCOMMERCIAL LICENSE 1.0.0
+
+TensoRAG: Multilinear Generalized Singular Value Decomposition (ML-GSVD)
+Copyright 2026 Forstwichtel & Contributors
+
+===============================================================================
+1. NONCOMMERCIAL LICENSE GRANT
+===============================================================================
+The licensor grants you a non-exclusive, royalty-free, worldwide license to
+use, reproduce, modify, display, perform, and distribute this software for
+Noncommercial Purposes only.
+
+===============================================================================
+2. NONCOMMERCIAL PURPOSES DEFINITION
+===============================================================================
+"Noncommercial Purposes" means use solely for:
+  - Academic research, university projects, and scientific publications
+  - Educational, teaching, and learning activities
+  - Personal hobby projects and individual non-monetized testing
+  - Non-profit research institutions and open scientific evaluation
+
+Any use directed toward commercial advantage, monetary compensation, internal
+business operations in a for-profit entity, or integration into commercial
+products and paid services is strictly EXCLUDED from this noncommercial grant.
+
+===============================================================================
+3. COMMERCIAL USE & LICENSING
+===============================================================================
+Commercial use of TensoRAG is prohibited under this license unless a separate
+Commercial License is obtained from the copyright holder.
+
+If you are a company, startup, or commercial entity wishing to use TensoRAG
+in production, internal tools, SaaS products, or proprietary software, please
+request a commercial license by contacting:
+
+  Maintainer: Forstwichtel
+  Email: forstwichtel@gmail.com
+  Repository: https://github.com/Forstwichtel/TensoRAG
+
+Commercial licenses include rights for proprietary integration, custom SLAs,
+and enterprise support options.
+
+===============================================================================
+4. DISCLAIMER OF WARRANTY & LIMITATION OF LIABILITY
+===============================================================================
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

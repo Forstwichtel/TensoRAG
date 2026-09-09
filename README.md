@@ -1,21 +1,23 @@
 # TensoRAG: Multilinear Generalized Singular Value Decomposition (ML-GSVD)
 
+<p align="center">
+  <img src="tensorag_github_logo.png" alt="TensoRAG Logo" width="800">
+</p>
+
+A high-performance Python/NumPy implementation of the **Multilinear Generalized Singular Value Decomposition (ML-GSVD)**, based on the pioneering mathematical research of **Dr. Liana Khamidullina** and **Prof. Martin Haardt** (Technische Universität Ilmenau).
+
+[![License: PolyForm NonCommercial 1.0.0](https://img.shields.io/badge/License-PolyForm_NonCommercial_1.0.0-blue.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12%2B-blue.svg)](https://www.python.org/)
 [![Interactive Demo](https://img.shields.io/badge/Streamlit-Interactive_Demo-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://tensorag.streamlit.app/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/)
 
-A high-performance Python/NumPy implementation of the Multilinear Generalized Singular Value Decomposition (ML-GSVD), based on the pioneering mathematical research of Dr. Liana Khamidullina and Prof. Martin Haardt (Technische Universität Ilmenau).
-
-⚠️ **Disclaimer:** This is an independent, private hobby project developed by @Forstwichtel. It is not officially affiliated with, endorsed by, or in any way connected to the authors or the Technische Universität Ilmenau. This repository serves solely as an independent implementation of their published academic findings.
-
-🌐 *Read this documentation in [German / Deutsch](README_DE.md).*
+> ⚠️ **Disclaimer:** This is an independent, private hobby project developed by @Forstwichtel. It is not officially affiliated with, endorsed by, or in any way connected to the authors or the Technische Universität Ilmenau. This repository serves solely as an independent implementation of their published academic findings.
 
 ---
 
 ## 👥 Authors & Contributors
 
-*   **Main Author:** Forstwichtel [forstwichtel@gmail.com]
-*   **Co-Author:** Helferlein [bot]
+*   **Main Author:** Forstwichtel (Pseudonym)
+*   **Co-Author:** Gemini Notebook [bot]
 
 ---
 
@@ -39,22 +41,23 @@ $$\mathbf{H}_k \approx \mathbf{B}_k \cdot \mathbf{C}_k \cdot \mathbf{A}^H \quad 
 *   **Simultaneous Multi-Matrix Factorization:** Jointly decomposes $K \ge 2$ matrices with different row dimensions but a shared column dimension.
 *   **True Orthogonal Procrustes Solver:** Solves the orthogonal factor updates via stable polar decomposition (using SVD) to guarantee strict column-orthogonality down to machine precision ($\sim 10^{-15}$ / standard float64 limits).
 *   **Alternating Least Squares (ALS):** Implements the robust *Direct Fitting* iterative optimization algorithm.
+*   **Two-Stage Retrieval Engine:** Integrated coarse-to-fine search pattern using fast subspace filtering ($O(N)$ via `np.argpartition`) followed by exact raw-data rescoring.
 *   **Complex & Real Support:** Fully compatible with both real-valued data (e.g., neural network weights) and complex-valued data (e.g., wireless signal processing / MIMO channel matrices).
 *   **Low-Rank Compression:** Optimal for reducing parameter footprint in deep learning (e.g., compressing Attention layers) and streamlining large-scale Vector Search / RAG databases.
-*   **Interactive AI Agent Simulation:** Features a live, step-by-step simulation demonstrating how an autonomous AI Agent uses the compressed ML-GSVD vector database as a retrieval tool to answer queries with minimum memory overhead.
-
 
 ---
 
 ## 📂 Repository Structure
 
 ```text
-├── LICENSE                 # Apache-2.0 License Text
+├── LICENSE                 # PolyForm NonCommercial 1.0.0 License
 ├── NOTICE                  # Copyright & academic attribution statements
-├── README.md               # Project documentation and guide (this file)
-├── tensorag.py             # Single-file production-ready implementation of ML-GSVD
+├── README.md               # English main documentation (this file)
+├── README_DE.md            # German documentation
+├── tensorag.py             # Production-ready implementation of ML-GSVD class & Two-Stage Search
 ├── tensorag_demo.py        # Complete RAG simulation demonstrating vector compression
-└── tensorag_benchmark.py   # Speed & latency comparison benchmark script
+├── tensorag_benchmark.py   # Speed & latency comparison benchmark script
+└── tensorag_streamlit_demo.py # Code for interactive Streamlit Web Dashboard
 ```
 
 ---
@@ -91,9 +94,40 @@ print(f"Slice 0 Reconstruction Error: {reconstruction_error:.4f}")
 
 ---
 
+## 🎯 Two-Stage Retrieval Pattern (Coarse-to-Fine Rescoring)
+
+To eliminate compression-induced recall trade-offs while retaining **up to 91% RAM index savings**, TensoRAG provides a built-in **Two-Stage Search Pipeline**:
+
+1. **Stage 1 (Subspace Coarse Filter):** Projects the high-dimensional query into the $Q$-dimensional shared subspace ($\mathbf{q}_{comp} = \mathbf{q} \cdot \mathbf{A}^*$) and selects the top $N$ candidates (e.g. $N=30$) in $O(N)$ linear time using `np.argpartition`.
+2. **Stage 2 (Exact Raw Rescoring):** Computes exact Cosine Similarity for only those 30 pre-selected candidates against uncompressed original vectors.
+
+```python
+import numpy as np
+from tensorag import MultilinearGSVD
+
+# 1. Fit ML-GSVD model
+gsvd = MultilinearGSVD(target_rank=128).fit(H_list)
+
+# 2. Execute Two-Stage Search for a high-dimensional query vector (e.g. 1536-dim)
+query_vec = np.random.randn(1536)
+
+final_doc_ids, final_scores = gsvd.two_stage_search(
+    k=0,                        # Target database collection index
+    query_vector=query_vec,     # Original uncompressed query vector
+    raw_vectors_k=H_list[0],   # Uncompressed vectors for stage 2 rescoring
+    top_k=5,                    # Desired number of final results
+    top_n_candidates=30         # Stage 1 over-fetching candidate count
+)
+
+print("Top-5 Document IDs:", final_doc_ids)
+print("Top-5 Exact Cosine Scores:", final_scores)
+```
+
+---
+
 ## 📜 Academic Attribution & Citation
 
-If you use this code or algorithm in your research or commercial applications, please cite the underlying academic publications that made this work possible:
+If you use this code or algorithm in your research or applications, please cite the underlying academic publications that made this work possible:
 
 ### Primary Thesis
 > **Khamidullina, Liana (2024).**  
@@ -104,26 +138,24 @@ If you use this code or algorithm in your research or commercial applications, p
 
 ### Key Journal Publication
 > **L. Khamidullina, A. L. F. de Almeida, and M. Haardt,**  
-> "Multilinear Generalized Singular Value Decomposition (ML-GSVD) and Its Application to Multiuser MIMO Systems,"  \
+> "Multilinear Generalized Singular Value Decomposition (ML-GSVD) and Its Application to Multiuser MIMO Systems,"  
 > *IEEE Transactions on Signal Processing*, vol. 70, pp. 2783-2797, 2022.  
 > DOI: [10.1109/TSP.2022.3178902](https://doi.org/10.1109/TSP.2022.3178902)
 
 ---
 
-## ⚖️ License & GDPR Compliance
+## ⚖️ License & Commercial Licensing
 
-### License
-This project is licensed under the **Apache License, Version 2.0**. You are free to copy, modify, distribute, and perform the work, even for commercial purposes, under the terms of the license. See the [LICENSE](LICENSE) file for more details.
+### Non-Commercial / Academic License
+TensoRAG is dual-licensed. This repository is free for **academic research, educational purposes, university projects, non-profit scientific evaluation, and personal non-commercial experimentation** under the [PolyForm NonCommercial License 1.0.0](LICENSE).
+
+### Commercial Licensing & Enterprise Use
+Commercial use—including integration into proprietary products, commercial SaaS platforms, internal production tools in a for-profit company, or paid consulting services—requires a separate **Commercial License**.
+
+To request a commercial license, custom SLAs, or enterprise support, please contact:
+* **Maintainer:** Forstwichtel
+* **Email:** [forstwichtel@gmail.com](mailto:forstwichtel@gmail.com)
 
 ### GDPR / Privacy
-*   **Zero Telemetry:** This code is entirely offline and air-gapped. It does not collect, store, track, or transmit any user metrics, system data, or personal identifiers.
-*   **Privacy-First:** Ensure that any datasets or embeddings you process with this library are fully anonymized. The authors of this repository do not have access to any data you run through this algorithm.
-
----
-
-## Videos
-
-https://github.com/user-attachments/assets/fd4db8e2-47be-4288-af65-cff3a7ec9ba0
-
-https://github.com/user-attachments/assets/23c864a8-338a-425d-9244-f178d0bb7ac4
-
+* **Zero Telemetry:** This code operates 100% offline and air-gapped. It does not collect, store, track, or transmit any user metrics or system data.
+* **Privacy-First:** All vector data processed by this library remains strictly local.

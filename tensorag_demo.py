@@ -1,42 +1,37 @@
-# ==============================================================================
-# TensoRAG: Vector Compression & Multi-Domain Retrieval Optimization Demo
 # Copyright 2026 Forstwichtel & Gemini Notebook [bot]
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the PolyForm NonCommercial License 1.0.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://polyformproject.org/licenses/noncommercial/1.0.0/
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ==============================================================================
+#
+# Project: TensoRAG
+# Authors: Forstwichtel, Gemini Notebook [bot]
 
 import numpy as np
 import time
 
-# HINWEIS: Dieses Skript setzt voraus, dass sich Ihre Datei tensorag.py 
-# im selben Ordner befindet.
+# HINWEIS: Dieses Skript setzt voraus, dass sich Ihre Datei ml_gsvd.py 
+# (oder ml_gsvd-v2.py umbenannt in ml_gsvd.py) im selben Ordner befindet.
 try:
     from tensorag import MultilinearGSVD
 except ImportError:
-    # Fallback für die Ausführung in der Entwicklungsumgebung
     import importlib.util
     import os
-    if os.path.exists("/workspace/artifacts/tensorag.py"):
-        spec = importlib.util.spec_from_file_location("tensorag", "/workspace/artifacts/tensorag.py")
-    elif os.path.exists("/workspace/out/tensorag.py"):
-        spec = importlib.util.spec_from_file_location("tensorag", "/workspace/out/tensorag.py")
+    if os.path.exists("./tensorag.py"):
+        spec = importlib.util.spec_from_file_location("tensorag", "./tensorag.py")
+        tensorag = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(tensorag)
+        MultilinearGSVD = tensorag.MultilinearGSVD
     else:
-        raise ImportError(
-            "Bitte stellen Sie sicher, dass sich tensorag.py im selben Ordner wie dieses Skript befindet."
-        )
-    tensorag_mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(tensorag_mod)
-    MultilinearGSVD = tensorag_mod.MultilinearGSVD
+        raise ImportError("Bitte stellen Sie sicher, dass sich tensorag.py im selben Ordner befindet.")
 
 def run_tensorag_demo():
     print("="*75)
